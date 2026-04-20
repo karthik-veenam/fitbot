@@ -197,6 +197,7 @@ async def _finalize_user(
         "weight_goal_kg": 0.0,
         "bmr": bmr,
         "is_admin": False,
+        "group": "default",
     }
     with open("config.json", "w") as f:
         json.dump(cfg_data, f, indent=2)

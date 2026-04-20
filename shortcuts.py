@@ -49,7 +49,8 @@ _PAT_WEEK = re.compile(
 
 
 def _bail(text: str, user_cfg, all_users: dict) -> bool:
-    other_names = [u.name for u in all_users.values() if u.db_prefix != user_cfg.db_prefix]
+    other_names = [u.name for u in all_users.values()
+                   if u.db_prefix != user_cfg.db_prefix and u.group == user_cfg.group]
     for name in other_names:
         if re.search(rf"\b{re.escape(name)}\b", text, re.I):
             return True

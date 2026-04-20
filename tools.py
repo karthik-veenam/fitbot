@@ -264,6 +264,25 @@ TOOLS = [
     {
         "type": "function",
         "function": {
+            "name": "set_group",
+            "description": (
+                "Assign a user to a group. Users in the same group can see each other's data "
+                "and cross-log. Call when admin says 'add X to group Y', 'move X to group Y', "
+                "'set X's group to Y'."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "for_user": {"type": "string", "description": "Name of the user to assign"},
+                    "group":    {"type": "string", "description": "Group name (e.g. 'family', 'work')"},
+                },
+                "required": ["for_user", "group"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
             "name": "save_memory",
             "description": (
                 "Save a long-term memory about the user that persists across conversations. "
@@ -389,12 +408,14 @@ TOOLS = [
 
 
 def _resolve_prefix(for_user: str | None, default_prefix: str) -> str:
-    """Resolve a user name to their db_prefix, or return default_prefix."""
+    """Resolve a user name to their db_prefix within the same group, or return default_prefix."""
     if not for_user or not _cfg:
         return default_prefix
     name_lower = for_user.strip().lower()
+    current = next((u for u in _cfg.telegram_users.values() if u.db_prefix == default_prefix), None)
+    current_group = current.group if current else "default"
     for u in _cfg.telegram_users.values():
-        if u.name.lower() == name_lower:
+        if u.name.lower() == name_lower and u.group == current_group:
             return u.db_prefix
     return default_prefix
 
@@ -537,6 +558,25 @@ def execute(name: str, args: dict, user_prefix: str) -> str:
                 "kcal_to_next_kg": to_next_kg,
                 "daily": daily,
             })
+
+        if name == "set_group":
+            target_name = args["for_user"].strip().lower()
+            new_group   = args["group"].strip().lower()
+            user_cfg = next((u for u in _cfg.telegram_users.values()
+                             if u.name.lower() == target_name), None) if _cfg else None
+            if not user_cfg:
+                return json.dumps({"error": f"User '{args['for_user']}' not found"})
+            user_cfg.group = new_group
+            import json as _json
+            with open("config.json") as f:
+                cfg_data = _json.load(f)
+            for u in cfg_data["telegram_users"].values():
+                if u.get("name", "").lower() == target_name:
+                    u["group"] = new_group
+                    break
+            with open("config.json", "w") as f:
+                _json.dump(cfg_data, f, indent=2)
+            return json.dumps({"success": True, "user": user_cfg.name, "group": new_group})
 
         if name == "save_memory":
             target = _resolve_prefix(args.get("for_user"), user_prefix)

@@ -57,10 +57,12 @@ _SYSTEM_MSG = {"role": "system", "content": SYSTEM_PROMPT}
 
 
 def _user_ctx(all_users: dict, current_cfg, text: str) -> dict:
-    """Wrap user message with per-turn context block — all users' info + who's sending."""
+    """Wrap user message with per-turn context block — same-group users' info + who's sending."""
     now = datetime.now(IST).strftime("%A, %B %d, %Y — %I:%M %p IST")
     user_parts = []
     for ucfg in all_users.values():
+        if ucfg.group != current_cfg.group:
+            continue
         latest_w = db.get_weight_log(ucfg.db_prefix, days=1)
         if latest_w:
             w = f"{latest_w[0]['weight_kg']}kg"

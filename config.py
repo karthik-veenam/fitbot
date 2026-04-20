@@ -16,6 +16,7 @@ class UserConfig:
     fitbit_access_token: str = ""
     fitbit_refresh_token: str = ""
     is_admin: bool = False
+    group: str = "default"
 
 
 @dataclass
