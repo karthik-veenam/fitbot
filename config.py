@@ -15,6 +15,7 @@ class UserConfig:
     bmr: int = 2000
     fitbit_access_token: str = ""
     fitbit_refresh_token: str = ""
+    is_admin: bool = False
 
 
 @dataclass
