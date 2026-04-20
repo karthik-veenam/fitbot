@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>FitBot</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="/static/style.css?v=6">
+</head>
+<body>
+  <div id="app">
+    <header>
+      <div id="header-name">FitBot</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div id="header-date"></div>
+        <button id="btn-refresh" title="Refresh">↻</button>
+      </div>
+    </header>
+
+    <nav>
+      <button class="tab active" data-tab="today">Today</button>
+      <button class="tab" data-tab="week">Week</button>
+      <button class="tab" data-tab="weight">Weight</button>
+    </nav>
+
+    <main>
+      <!-- TODAY -->
+      <section id="tab-today" class="tab-content active">
+        <div class="card">
+          <div class="card-title">Calories</div>
+          <canvas id="today-cal-chart" height="130"></canvas>
+          <div class="net-row">
+            <span>Net</span>
+            <span id="val-net" class="net-value">—</span>
+            <span id="val-goal" class="goal-label"></span>
+          </div>
+          <div class="net-row" style="padding-top:6px;border-top:none;margin-top:-4px">
+            <span style="color:var(--hint);font-size:13px">Can still eat</span>
+            <span id="val-remaining" style="font-weight:600;font-size:15px">—</span>
+          </div>
+        </div>
+
+        <div class="card" id="protein-card">
+          <div class="card-title">Protein</div>
+          <div class="bar-row">
+            <span class="bar-label">Today</span>
+            <div class="bar-track"><div class="bar-fill bar-protein" id="bar-protein"></div></div>
+            <span class="bar-value" id="val-protein">—</span>
+          </div>
+          <div class="protein-sub" id="protein-sub"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Food</div>
+          <ul id="food-list" class="log-list"></ul>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Activity</div>
+          <ul id="activity-list" class="log-list"></ul>
+        </div>
+      </section>
+
+      <!-- WEEK -->
+      <section id="tab-week" class="tab-content">
+        <div class="range-pills">
+          <button class="pill active" data-days="7">7d</button>
+          <button class="pill" data-days="10">10d</button>
+          <button class="pill" data-days="14">14d</button>
+          <button class="pill" data-days="30">30d</button>
+        </div>
+        <div class="card">
+          <div class="card-title" id="week-chart-title">Calories — last 7 days</div>
+          <canvas id="week-chart"></canvas>
+        </div>
+        <div class="card">
+          <div class="card-title">Net calories</div>
+          <canvas id="net-chart"></canvas>
+        </div>
+        <div class="card" id="deficit-card">
+          <div class="card-title">Accumulated deficit</div>
+          <div class="stat-row"><span>Total deficit</span><span id="acc-deficit">—</span></div>
+          <div class="stat-row"><span>Fat equivalent</span><span id="acc-fat">—</span></div>
+          <div class="stat-row"><span>Based on BMR</span><span id="acc-bmr">—</span></div>
+          <div style="margin-top:8px">
+            <div class="bar-row">
+              <div class="bar-track"><div class="bar-fill bar-protein" id="bar-deficit"></div></div>
+              <span class="bar-value" id="val-deficit-pct">—</span>
+            </div>
+            <div class="protein-sub" id="deficit-sub"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- WEIGHT -->
+      <section id="tab-weight" class="tab-content">
+        <div class="card">
+          <div class="card-title">Weight (last 30 days)</div>
+          <canvas id="weight-chart"></canvas>
+        </div>
+        <div id="weight-stats" class="card" style="display:none">
+          <div class="stat-row"><span>Latest</span><span id="w-latest">—</span></div>
+          <div class="stat-row"><span>Goal</span><span id="w-goal">—</span></div>
+          <div class="stat-row"><span>To go</span><span id="w-togo">—</span></div>
+          <div class="stat-row"><span>30d high</span><span id="w-high">—</span></div>
+          <div class="stat-row"><span>30d low</span><span id="w-low">—</span></div>
+          <div class="stat-row"><span>30d change</span><span id="w-change">—</span></div>
+        </div>
+        <div id="weight-goal-bar" class="card" style="display:none">
+          <div class="card-title">Goal progress</div>
+          <div class="bar-row">
+            <div class="bar-track"><div class="bar-fill bar-weight-goal" id="bar-wgoal"></div></div>
+            <span class="bar-value" id="val-wgoal-pct">—</span>
+          </div>
+          <div id="wgoal-sub" class="protein-sub"></div>
+        </div>
+      </section>
+    </main>
+
+    <div id="loading">Loading…</div>
+    <div id="error" style="display:none"></div>
+  </div>
+  <script src="/static/app.js?v=7"></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+[Unit]
+Description=FitBot Fitness Telegram Agent
+After=network.target
+
+[Service]
+User=djpi
+WorkingDirectory=/home/djpi/fitbot
+ExecStart=/home/djpi/momo-env/bin/python -u main.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
