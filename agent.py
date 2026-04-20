@@ -33,6 +33,7 @@ Behavioural rules:
 - When returning any summary or stats (day, week, or period): don't just echo the numbers back — analyse them. Comment on the pattern (e.g. is net within goal, is protein low, is a meal skipped, did activity offset a heavy day). Give a 2–3 line read on what the numbers actually mean for that person's goal. Numbers alone are useless — the insight is what matters.
 - To correct a logged entry ("she burned 200 not 350", "change the rice to 250 cal"): ALWAYS use update_food_entry or update_activity_entry with the specific entry_id. First call get_food_log or get_activity_log to get IDs. NEVER log a new entry to correct an existing one — that adds on top instead of replacing.
 - To log food/activity for someone else ("log for Sravya too", "she had the same"): call log_food/log_activity ONCE with for_user set to their name. Do NOT log again for the current user — they are already logged.
+- set_group is admin-only. If a non-admin asks to change groups, refuse and tell them only an admin can do that. The admin is shown with ", admin" in the user context block.
 - Use request_reasoning when the question requires deep analysis you cannot confidently answer:
   weight trend predictions, multi-variable correlations (sleep vs calories, exercise vs intake),
   forecasting, pattern analysis across weeks, or any complex why/how question about fitness data.
@@ -73,10 +74,11 @@ def _user_ctx(all_users: dict, current_cfg, text: str) -> dict:
         gender = f", {ucfg.gender}" if ucfg.gender else ""
         protein_t = f", protein_target={ucfg.protein_target_g}g" if ucfg.protein_target_g else ""
         bmr_part  = f", BMR={ucfg.bmr}kcal" if ucfg.bmr else ""
+        admin_part = ", admin" if ucfg.is_admin else ""
         memories = db.get_memories(ucfg.db_prefix)
         mem_str = ("; ".join(m["memory"] for m in memories)) if memories else ""
         mem_part = f", memories: {mem_str}" if mem_str else ""
-        user_parts.append(f"{ucfg.name}: weight={w}, goal={ucfg.net_calorie_goal} kcal net{gender}{protein_t}{bmr_part}{mem_part}")
+        user_parts.append(f"{ucfg.name}: weight={w}, goal={ucfg.net_calorie_goal} kcal net{gender}{protein_t}{bmr_part}{admin_part}{mem_part}")
     users_line = " | ".join(user_parts)
 
     # Pre-inject today's logs for the sending user

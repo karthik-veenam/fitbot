@@ -560,6 +560,10 @@ def execute(name: str, args: dict, user_prefix: str) -> str:
             })
 
         if name == "set_group":
+            caller = next((u for u in _cfg.telegram_users.values()
+                           if u.db_prefix == user_prefix), None) if _cfg else None
+            if not caller or not caller.is_admin:
+                return json.dumps({"error": "Only admins can change group assignments."})
             target_name = args["for_user"].strip().lower()
             new_group   = args["group"].strip().lower()
             user_cfg = next((u for u in _cfg.telegram_users.values()
